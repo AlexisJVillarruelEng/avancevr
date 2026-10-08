@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -14,6 +15,7 @@ Juego CrearJuego() => new Juego(new[]
 }, 60f);
 
 Juego juego = CrearJuego();
+
 Stopwatch reloj = Stopwatch.StartNew();
 
 double tiempoAnterior = reloj.Elapsed.TotalSeconds;
@@ -29,6 +31,7 @@ try
 {
     while (true)
     {
+        // Lectura del teclado
         while (Console.KeyAvailable)
         {
             ConsoleKey tecla = Console.ReadKey(true).Key;
@@ -73,22 +76,27 @@ try
             ultimaTecla = reloj.Elapsed.TotalSeconds;
         }
 
+        // Calcular tiempo transcurrido
         double ahora = reloj.Elapsed.TotalSeconds;
+
         float deltaTime = (float)(ahora - tiempoAnterior);
         tiempoAnterior = ahora;
 
+        // Detener movimiento si no se presiona una tecla
         if (ahora - ultimaTecla > 0.25)
         {
             horizontal = 0f;
             vertical = 0f;
         }
 
+        // Actualizar el juego
         juego.Actualizar(
             horizontal,
             vertical,
             Math.Min(deltaTime, 0.2f)
         );
 
+        // Dibujar informacion
         Console.SetCursorPosition(0, 0);
 
         Console.WriteLine("=== RECOLECTOR PAC-MAN ===       ");
@@ -97,22 +105,32 @@ try
         Console.WriteLine($"Estado: {juego.Estado}         ");
         Console.WriteLine();
 
+        // Dibujar tablero
         for (int z = 5; z >= -5; z--)
         {
             for (int x = -5; x <= 5; x++)
             {
                 char simbolo = '.';
 
+                // Paredes
                 if (!juego.Mapa.PuedeOcupar(x, z, 0.25f))
+                {
                     simbolo = '#';
+                }
 
+                // Monedas
                 if (juego.Monedas.Any(m =>
                     !m.Recogido && m.X == x && m.Z == z))
+                {
                     simbolo = '*';
+                }
 
+                // Jugador
                 if (MathF.Abs(juego.Jugador.X - x) < 0.5f &&
                     MathF.Abs(juego.Jugador.Z - z) < 0.5f)
+                {
                     simbolo = 'P';
+                }
 
                 Console.Write(simbolo + " ");
             }
@@ -124,12 +142,19 @@ try
         Console.WriteLine("WASD / Flechas: mover");
         Console.WriteLine("R: reiniciar | Q: salir");
 
+        // Resultado de la partida
         if (juego.Estado == EstadoPartida.Ganada)
+        {
             Console.WriteLine("GANASTE!                  ");
+        }
         else if (juego.Estado == EstadoPartida.Perdida)
+        {
             Console.WriteLine("PERDISTE!                 ");
+        }
         else
+        {
             Console.WriteLine("                          ");
+        }
 
         Thread.Sleep(100);
     }

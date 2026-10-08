@@ -5,6 +5,7 @@ public class Coleccionable
 {
     public float X { get; }
     public float Z { get; }
+
     public bool Recogido { get; private set; }
 
     public Coleccionable(float x, float z)
@@ -15,7 +16,8 @@ public class Coleccionable
 
     public bool IntentarRecoger(Jugador jugador)
     {
-        if (Recogido) return false;
+        if (Recogido)
+            return false;
 
         float dx = jugador.X - X;
         float dz = jugador.Z - Z;
@@ -32,9 +34,8 @@ public class Coleccionable
         return false;
     }
 
-
-public void Reiniciar()
-{
-    Recogido = false;
-}
+    public void Reiniciar()
+    {
+        Recogido = false;
+    }
 }

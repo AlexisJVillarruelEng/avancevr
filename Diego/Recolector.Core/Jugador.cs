@@ -1,3 +1,6 @@
+
+using System;
+
 namespace Recolector.Core;
 
 public class Jugador
@@ -30,10 +33,12 @@ public class Jugador
         float dx = horizontal * Velocidad * deltaTime;
         float dz = vertical * Velocidad * deltaTime;
 
-        // Dividir el desplazamiento para evitar
-        // atravesar paredes con movimientos grandes.
         float distancia = MathF.Sqrt(dx * dx + dz * dz);
-        int pasos = Math.Max(1, (int)MathF.Ceiling(distancia / 0.1f));
+
+        int pasos = Math.Max(
+            1,
+            (int)MathF.Ceiling(distancia / 0.1f)
+        );
 
         for (int i = 0; i < pasos; i++)
         {
@@ -48,11 +53,9 @@ public class Jugador
         }
     }
 
-
     public void Reiniciar()
-{
-    X = 0f;
-    Z = 0f;
-}
-
+    {
+        X = 0f;
+        Z = 0f;
+    }
 }

@@ -84,21 +84,34 @@ public class JuegoTests
             new Coleccionable(1f, 0f)
         });
 
-        // Ganar la partida
         juego.Actualizar(1f, 0f, 1f / 3f);
 
         Assert.Equal(EstadoPartida.Ganada, juego.Estado);
         Assert.Equal(10, juego.Puntos);
 
-        // Reiniciar la partida
         juego.Reiniciar();
 
-        // Comprobar valores iniciales
         Assert.Equal(EstadoPartida.EnCurso, juego.Estado);
         Assert.Equal(0, juego.Puntos);
         Assert.Equal(60f, juego.TiempoRestante);
         Assert.Equal(0f, juego.Jugador.X);
         Assert.Equal(0f, juego.Jugador.Z);
         Assert.False(juego.Monedas[0].Recogido);
+    }
+
+    // PRUEBA 7: Recoleccion durante movimiento rapido
+    [Fact]
+    public void RecogeMonedaDuranteMovimientoRapido()
+    {
+        Juego juego = new(new[]
+        {
+            new Coleccionable(1f, 0f),
+            new Coleccionable(-2f, 2f)
+        });
+
+        juego.Actualizar(1f, 0f, 0.6f);
+
+        Assert.Equal(10, juego.Puntos);
+        Assert.True(juego.Monedas[0].Recogido);
     }
 }

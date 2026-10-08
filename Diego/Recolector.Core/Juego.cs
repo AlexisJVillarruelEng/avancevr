@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,34 +46,66 @@ public class Juego
         if (Estado != EstadoPartida.EnCurso ||
             !float.IsFinite(deltaTime) ||
             deltaTime <= 0f)
+        {
             return;
+        }
 
-        float tiempoMovimiento =
+        float tiempoDisponible =
             Math.Min(deltaTime, TiempoRestante);
 
-        Jugador.Mover(
-            horizontal,
-            vertical,
-            tiempoMovimiento,
-            Mapa
+        float tiempoInicial = TiempoRestante;
+
+        // Dividir movimientos grandes en pasos pequeños
+        // para detectar monedas durante el recorrido.
+        int pasos = Math.Max(
+            1,
+            (int)MathF.Ceiling(
+                MathF.Max(0f, Jugador.Velocidad) *
+                tiempoDisponible / 0.1f
+            )
         );
 
-        foreach (var moneda in Monedas)
+        float tiempoPaso = tiempoDisponible / pasos;
+
+        for (int i = 0; i < pasos; i++)
         {
-            if (moneda.IntentarRecoger(Jugador))
+            Jugador.Mover(
+                horizontal,
+                vertical,
+                tiempoPaso,
+                Mapa
+            );
+
+            // Detectar monedas recogidas
+            foreach (var moneda in Monedas)
             {
-                Puntos += 10;
+                if (moneda.IntentarRecoger(Jugador))
+                {
+                    Puntos += 10;
+                }
+            }
+
+            // Comprobar victoria
+            if (Monedas.All(m => m.Recogido))
+            {
+                TiempoRestante = Math.Max(
+                    0f,
+                    tiempoInicial - (i + 1) * tiempoPaso
+                );
+
+                Estado = EstadoPartida.Ganada;
+                return;
             }
         }
 
-        TiempoRestante =
-            Math.Max(0f, TiempoRestante - deltaTime);
+        // Actualizar cronometro
+        TiempoRestante = Math.Max(
+            0f,
+            tiempoInicial - deltaTime
+        );
 
-        if (Monedas.All(m => m.Recogido))
-        {
-            Estado = EstadoPartida.Ganada;
-        }
-        else if (TiempoRestante <= 0f)
+        // Comprobar derrota
+        if (TiempoRestante <= 0f)
         {
             Estado = EstadoPartida.Perdida;
         }
