@@ -424,12 +424,20 @@ PrefabInstance:
       value: MinijuegoRecolector
       objectReference: {fileID: 0}
     - target: {fileID: 4298610008454820234, guid: 9d8d8f91008409546b4a89e7631e0486, type: 3}
+      propertyPath: zonaMuerta
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 4298610008454820234, guid: 9d8d8f91008409546b4a89e7631e0486, type: 3}
       propertyPath: imageTarget
       value: 
       objectReference: {fileID: 1662361381}
     - target: {fileID: 4298610008454820234, guid: 9d8d8f91008409546b4a89e7631e0486, type: 3}
+      propertyPath: sensibilidad
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4298610008454820234, guid: 9d8d8f91008409546b4a89e7631e0486, type: 3}
       propertyPath: usarInclinacion
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5502412775007582339, guid: 9d8d8f91008409546b4a89e7631e0486, type: 3}
       propertyPath: m_LocalScale.x
@@ -504,8 +512,8 @@ GameObject:
   - component: {fileID: 1662361378}
   - component: {fileID: 1662361381}
   - component: {fileID: 1662361380}
-  - component: {fileID: 1662361383}
   - component: {fileID: 1662361382}
+  - component: {fileID: 1662361383}
   m_Layer: 0
   m_Name: ImageTarget
   m_TagString: Untagged
@@ -588,14 +596,14 @@ MonoBehaviour:
   PreviewVisible: 1
   RuntimeOcclusion: 0
   RuntimeCollider: 0
-  mTrackableName: qr-code
+  mTrackableName: qr-code_scaled
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/avanceproy.xml
   mAspectRatio: 1
-  mImageTargetType: 0
+  mImageTargetType: 3
   mWidth: 0.1
   mHeight: 0.1
-  mRuntimeTexture: {fileID: 0}
+  mRuntimeTexture: {fileID: 2800000, guid: 877f3654a46e59842ba14392f789101c, type: 3}
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
@@ -626,7 +634,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Vuforia.Unity.Engine.dll::Vuforia.ImageTargetPreview
   mObserverBehaviour: {fileID: 1662361381}
   mHiddenRoot: {fileID: 0}
-  mTargetName: qr-code
+  mTargetName: qr-code_scaled
   mDatasetName: Vuforia/avanceproy.xml
   mCastedBehaviour: {fileID: 1662361381}
   mMeshFilter: {fileID: 0}
