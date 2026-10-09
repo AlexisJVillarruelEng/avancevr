@@ -1,7 +1,7 @@
-
 using System.Linq;
 using UnityEngine;
 using Recolector.Core;
+using Vuforia;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -9,11 +9,15 @@ using UnityEngine.InputSystem;
 
 public class RecolectorController : MonoBehaviour
 {
-    [Header("Jugador")]
+    [Header("Objetos")]
     public Transform jugadorVisual;
-
-    [Header("Monedas")]
     public GameObject[] monedasVisuales;
+
+    [Header("Realidad aumentada")]
+    public ImageTargetBehaviour imageTarget;
+    public bool usarInclinacion = false;
+    public float sensibilidad = 4f;
+    public float zonaMuerta = 0.05f;
 
     private Juego juego;
 
@@ -24,7 +28,7 @@ public class RecolectorController : MonoBehaviour
             monedasVisuales.Length == 0 ||
             monedasVisuales.Any(m => m == null))
         {
-            Debug.LogError("Faltan objetos por asignar.");
+            Debug.LogError("Faltan referencias del recolector.");
             enabled = false;
             return;
         }
@@ -32,8 +36,8 @@ public class RecolectorController : MonoBehaviour
         juego = new Juego(
             monedasVisuales.Select(m =>
                 new Coleccionable(
-                    m.transform.position.x,
-                    m.transform.position.z
+                    m.transform.localPosition.x,
+                    m.transform.localPosition.z
                 )
             ),
             60f
@@ -74,22 +78,8 @@ public class RecolectorController : MonoBehaviour
             reiniciar = teclado.rKey.wasPressedThisFrame;
         }
 #elif ENABLE_LEGACY_INPUT_MANAGER
-        if (Input.GetKey(KeyCode.A) ||
-            Input.GetKey(KeyCode.LeftArrow))
-            horizontal -= 1f;
-
-        if (Input.GetKey(KeyCode.D) ||
-            Input.GetKey(KeyCode.RightArrow))
-            horizontal += 1f;
-
-        if (Input.GetKey(KeyCode.W) ||
-            Input.GetKey(KeyCode.UpArrow))
-            vertical += 1f;
-
-        if (Input.GetKey(KeyCode.S) ||
-            Input.GetKey(KeyCode.DownArrow))
-            vertical -= 1f;
-
+        horizontal = Input.GetAxisRaw("Horizontal");
+        vertical = Input.GetAxisRaw("Vertical");
         reiniciar = Input.GetKeyDown(KeyCode.R);
 #endif
 
@@ -98,6 +88,40 @@ public class RecolectorController : MonoBehaviour
             juego.Reiniciar();
             ActualizarVisuales();
             return;
+        }
+
+        if (imageTarget != null)
+        {
+            Status estado = imageTarget.TargetStatus.Status;
+
+            if (estado != Status.TRACKED &&
+                estado != Status.EXTENDED_TRACKED)
+                return;
+        }
+
+        if (usarInclinacion && imageTarget != null)
+        {
+            Vector3 pendiente = Vector3.ProjectOnPlane(
+                Vector3.down,
+                imageTarget.transform.up
+            );
+
+            horizontal = Vector3.Dot(
+                pendiente, imageTarget.transform.right
+            ) * sensibilidad;
+
+            vertical = Vector3.Dot(
+                pendiente, imageTarget.transform.forward
+            ) * sensibilidad;
+
+            if (Mathf.Abs(horizontal) < zonaMuerta)
+                horizontal = 0f;
+
+            if (Mathf.Abs(vertical) < zonaMuerta)
+                vertical = 0f;
+
+            horizontal = Mathf.Clamp(horizontal, -1f, 1f);
+            vertical = Mathf.Clamp(vertical, -1f, 1f);
         }
 
         juego.Actualizar(
@@ -111,12 +135,12 @@ public class RecolectorController : MonoBehaviour
 
     void ActualizarVisuales()
     {
-        Vector3 posicion = jugadorVisual.position;
+        Vector3 posicion = jugadorVisual.localPosition;
 
         posicion.x = juego.Jugador.X;
         posicion.z = juego.Jugador.Z;
 
-        jugadorVisual.position = posicion;
+        jugadorVisual.localPosition = posicion;
 
         for (int i = 0; i < monedasVisuales.Length; i++)
         {
@@ -136,7 +160,7 @@ public class RecolectorController : MonoBehaviour
             "Puntos: " + juego.Puntos + "\n" +
             "Tiempo: " + juego.TiempoRestante.ToString("F1") + "\n" +
             "Estado: " + juego.Estado + "\n" +
-            "WASD: Mover | R: Reiniciar"
+            "R: Reiniciar"
         );
     }
 }
