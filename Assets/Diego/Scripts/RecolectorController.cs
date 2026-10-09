@@ -40,7 +40,7 @@ public class RecolectorController : MonoBehaviour
                     m.transform.localPosition.z
                 )
             ),
-            60f
+            90f
         );
 
         ActualizarVisuales();
